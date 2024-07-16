@@ -22,7 +22,7 @@ def add_azure_share_client(azure_share_client_name: str):
         service_client = ShareServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
         share_client = service_client.get_share_client(azure_share_client_name)
         share_client.create_share()
-        print(f"Share client URL: {share_client.url}")  # デバッグログ
+        print(f"Share client URL: {share_client.url}") # デバッグログ
     except ResourceExistsError:
         print("Share client already exists")  # デバッグログ
     except Exception as e:
