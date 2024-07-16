@@ -66,7 +66,7 @@ jobs:
       - name: Set up Azure CLI
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }} 
 
       - name: Configure app settings with Azure CLI
         run: |
