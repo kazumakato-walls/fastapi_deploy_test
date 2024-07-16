@@ -72,5 +72,5 @@ jobs:
         uses: azure/appservice-settings@v1
         with:
           app-name: 'fastapi-deploy-test'
-          resource-group: 'myResourceGroup'
-          settings: AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          slot-name: 'Production'
+          app-settings-json: '{"AZURE_STORAGE_CONNECTION_STRING": "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"}'
