@@ -24,7 +24,7 @@ def add_azure_share_client(azure_share_client_name: str):
         share_client.create_share()
         print(f"Share client URL: {share_client.url}") # デバッグログ
     except ResourceExistsError:
-        print("Share client already exists")  # デバッグログ
+        print("Share client already exists")  #デバッグログ
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
