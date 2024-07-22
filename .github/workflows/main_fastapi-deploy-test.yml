@@ -54,4 +54,5 @@ jobs:
           package: .
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           PORT: 8000
