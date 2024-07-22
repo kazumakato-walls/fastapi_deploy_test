@@ -40,8 +40,10 @@ jobs:
         with:
           name: fastapi-app
 
-      - name: Wait before deployment
-        run: sleep 30  # 30秒の遅延を追加
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -50,7 +52,6 @@ jobs:
           app-name: 'fastapi-deploy-test'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
         env:
           CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
           PORT: 8000
