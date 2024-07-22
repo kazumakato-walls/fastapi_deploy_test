@@ -1,8 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-# More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
-
-name: Build and deploy Python app to Azure Web App - fastapi-deploy-test
+name: Build and deploy FastAPI app to Azure Web App
 
 on:
   push:
@@ -17,31 +13,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v3
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
-      - name: Create and start virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-      
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
 
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
+      - name: Test
+        run: pytest
 
-      - name: Upload artifact for deployment jobs
+      - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: python-app
-          path: |
-            release.zip
-            !venv/
+          name: fastapi-app
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -54,16 +41,19 @@ jobs:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: python-app
+          name: fastapi-app
 
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
+      - name: Wait before deployment
+        run: sleep 30  # 30秒の遅延を追加
 
-      
-      - name: 'Deploy to Azure Web App'
-        uses: azure/webapps-deploy@v3
+      - name: Deploy to Azure Web App
         id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
         with:
           app-name: 'fastapi-deploy-test'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_5126098114264E97B30C1DC8F850BAD7 }}
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+        env:
+          CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+          PORT: 8000
