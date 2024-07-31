@@ -15,7 +15,8 @@ PASSWORD = os.getenv('password')
 HOST = os.getenv('host')
 DATABASE_NAME = os.getenv('database_name')
 
-DATABASE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/{DATABASE_NAME}?ssl-mode=require'
+# 接続URLの作成
+DATABASE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/{DATABASE_NAME}?charset=utf8&ssl_mode=require'
 
 # DBとの接続
 ENGINE = create_engine(
@@ -23,6 +24,7 @@ ENGINE = create_engine(
     encoding="utf-8",
     echo=True
 )
+
 # modelで使用する
 Base = declarative_base()
 
