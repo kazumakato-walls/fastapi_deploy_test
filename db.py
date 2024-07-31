@@ -16,11 +16,19 @@ HOST = os.getenv('host')
 DATABASE_NAME = os.getenv('database_name')
 
 # 接続URLの作成
-DATABASE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/{DATABASE_NAME}?charset=utf8&ssl_mode=require'
+DATABASE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/{DATABASE_NAME}?charset=utf8'
+
+# SSLオプションの追加
+ssl_args = {
+    "ssl": {
+        "ca": "/etc/ssl/certs/ca-certificates.crt"
+    }
+}
 
 # DBとの接続
 ENGINE = create_engine(
     DATABASE_URL,
+    connect_args=ssl_args,
     encoding="utf-8",
     echo=True
 )
