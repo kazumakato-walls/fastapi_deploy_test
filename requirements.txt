@@ -19,3 +19,4 @@ python-dotenv
 azure-storage-blob
 fastapi-csrf-protect
 azure-storage-file-share
+pymysql
