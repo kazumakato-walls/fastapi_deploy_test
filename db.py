@@ -15,20 +15,14 @@ PASSWORD = os.getenv('password')
 HOST = os.getenv('host')
 DATABASE_NAME = os.getenv('database_name')
 
-DATABASE = 'mysql://%s:%s@%s/%s?charset=utf8' % (
-    USER_NAME,
-    PASSWORD,
-    HOST,
-    DATABASE_NAME,
-)
+DATABASE_URL = f'mysql+pymysql://{USER_NAME}:{PASSWORD}@{HOST}/{DATABASE_NAME}?ssl-mode=require'
 
 # DBとの接続
 ENGINE = create_engine(
-    DATABASE,
+    DATABASE_URL,
     encoding="utf-8",
     echo=True
 )
-
 # modelで使用する
 Base = declarative_base()
 
