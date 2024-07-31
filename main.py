@@ -4,7 +4,6 @@ from fastapi.responses  import JSONResponse
 from starlette.middleware.cors import CORSMiddleware  # CORSを回避するために必要
 # from api.models import Assignment
 from routers import auth, directory,company,file,favorite,user,department,region,industry
-from fastapi.security import OAuth2PasswordBearer
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from schemas.auth import CsrfSettings
