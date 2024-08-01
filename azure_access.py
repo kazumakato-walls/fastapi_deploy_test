@@ -1,3 +1,4 @@
+import re
 from azure.storage.fileshare import ShareServiceClient
 from fastapi import HTTPException, status
 from azure.core.exceptions import ResourceExistsError, ResourceNotFoundError
@@ -10,7 +11,7 @@ import time
 load_dotenv()
 
 # Azureポータルから取得した接続文字列
-AZURE_STORAGE_CONNECTION_STRING = os.getenv('AZURE_STORAGE_CONNECTION_STRING')
+AZURE_STORAGE_CONNECTION_STRING = os.getenv('connection_string')
 AZURE_SHARE_CLIENT_NAME = os.getenv('share_client_name')
 
 if AZURE_STORAGE_CONNECTION_STRING is None:
@@ -22,9 +23,9 @@ def add_azure_share_client(azure_share_client_name: str):
         service_client = ShareServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
         share_client = service_client.get_share_client(azure_share_client_name)
         share_client.create_share()
-        print(f"Share client URL: {share_client.url}") #デバッグログ
+        print(f"Share client URL: {share_client.url}")  # デバッグログ
     except ResourceExistsError:
-        print("Share client already exists")  #デバッグログ
+        print("Share client already exists")  # デバッグログ
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -270,4 +271,16 @@ def delete_azure_file(storage_name: str, directory_path: str, file_name: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete file: {repr(e)}"
+        )
+    
+# Azure ファイル共有に保存されている全てのディレクトリリストを取得
+def get_azure_directory_list(storage_name: str):
+    try:
+        service_client = ShareServiceClient.from_connection_string(AZURE_STORAGE_CONNECTION_STRING)
+        share_client = service_client.get_share_client(storage_name)
+        return [item['name'] for item in share_client.list_directories_and_files()]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get directory list: {repr(e)}"
         )
