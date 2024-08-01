@@ -1,4 +1,5 @@
 from fastapi import Depends, APIRouter, status, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import Annotated, List
 from schemas.directories import DirectoryResponse, DirectoryCreate, DirectoryRename, DirectoryDelete
@@ -8,7 +9,7 @@ from db import get_db
 from models import Company, Directory, Permission, File
 from sqlalchemy import or_, and_
 from datetime import datetime
-from azure_access import create_azure_folder, rename_azure_folder, delete_azure_folder_recursive
+from azure_access import create_azure_folder, rename_azure_folder, delete_azure_folder_recursive, get_azure_directory_list
 import os
 
 DbDependency = Annotated[Session, Depends(get_db)]
@@ -282,3 +283,16 @@ async def delete_directory(db: DbDependency, user: UserDependency, directory_del
     )
 
     return delete_result
+
+# Azureファイル共有に保存されている全てのディレクトリリストを取得する関数
+@router.get('/get_azure_all_directory', status_code=status.HTTP_200_OK)
+async def get_azure_all_directories(db: DbDependency, user: UserDependency):
+
+    # ユーザーの会社ストレージ名の取得
+    storage_name = get_user_storage_name(db, user.company_id)
+
+    # ディレクトリリストを取得
+    directories = get_azure_directory_list(storage_name)
+
+    # ディレクトリ情報を返す
+    return JSONResponse(content={"directories": directories})
