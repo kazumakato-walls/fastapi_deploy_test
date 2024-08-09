@@ -67,6 +67,21 @@ async def get_all_directories(db: DbDependency, user: UserDependency):
 
     return get_result
 
+@router.get('/get_root_directory',status_code=status.HTTP_200_OK)
+async def get_root_directory(db: DbDependency, user: UserDependency):
+    query_result = db.query(Directory)\
+        .filter(
+            Directory.company_id == user.company_id,
+            Directory.directory_class == 0,
+            Directory.delete_flg == False
+        )\
+        .first()
+
+    if not query_result:
+        raise HTTPException(status_code=404, detail="Directory not found")
+
+    return query_result.id
+
 @router.post("/add_directory", response_model=DirectoryResponse, status_code=status.HTTP_201_CREATED)
 async def create_directory(db: DbDependency, user: UserDependency, directory_create: DirectoryCreate):
 
