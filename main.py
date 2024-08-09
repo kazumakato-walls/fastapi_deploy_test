@@ -3,11 +3,11 @@ from fastapi import FastAPI, Request
 from fastapi.responses  import JSONResponse
 from starlette.middleware.cors import CORSMiddleware  # CORSを回避するために必要
 # from api.models import Assignment
-from routers import auth, directory,company,file,favorite,assignment,permission,user,department,region,industry
-from fastapi.security import HTTPBearer
+from routers import auth, directory,company,file,favorite,user,department,region,industry
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from schemas.auth import CsrfSettings
+import os
 
 app = FastAPI()
 origins= ['http://localhost:3000']
@@ -55,3 +55,7 @@ app.include_router(industry.router)
 
 
 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

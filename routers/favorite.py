@@ -20,7 +20,7 @@ async def queryParam(db: DbDependency, user: UserDependency):
     query1 = db.query(Favorite.id,
                       Directory.id.label('directory_id'),
                       Favorite.favorite_name,
-                      func.concat(func.coalesce(Directory.path, ''), Directory.directory_name).label('directory_path'),
+                      func.concat(Directory.path, Directory.directory_name).label('directory_path'),
                       Directory.directory_class
                       )\
                 .select_from(Favorite)\
@@ -40,7 +40,7 @@ async def queryParam(db: DbDependency, user: UserDependency):
     query2 = db.query(Favorite.id,
                       Directory.id.label('directory_id'),
                       Favorite.favorite_name,
-                      func.concat(func.coalesce(Directory.path, ''), Directory.directory_name).label('directory_path'),
+                      func.concat(Directory.path, Directory.directory_name).label('directory_path'),
                       Directory.directory_class
                       )\
                 .select_from(Favorite)\
