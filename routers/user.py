@@ -6,7 +6,7 @@ from starlette import status
 from schemas.users import UserCreate,UserResponse, UserGetResponse, UserAdminGetResponse, UserSignup, UserUpdateResponse, UserUpdate, UserAdminUpdate, UserPasswordUpdate
 from schemas.auth import Token
 from db import get_db
-from models import User, Department
+from models import User, Department, Company, Department
 import hashlib
 import base64
 import os
@@ -180,38 +180,41 @@ async def get_user(db: DbDependency, user: UserDependency):
     return user_info
 
 #全てのユーザー情報取得機能(Admin権限)
-@router.get("/get_all_user", response_model=List[UserAdminGetResponse], status_code=status.HTTP_200_OK)
-async def get_all_user(db: DbDependency, user: UserDependency, company_id: int):
+@router.get("/get_all_user", status_code=status.HTTP_200_OK)
+async def get_all_user(db: DbDependency, user: UserDependency):
     if not user.admin:
         raise HTTPException(status_code=403, detail="No authority")
-
-    user_query = db.query(User)\
-        .filter(
-            User.company_id == company_id,
-            User.delete_flg == "false"
-            )\
-        .all()
-
-    if not user_query:
-        raise HTTPException(status_code=404, detail="User not found")
     
-    users_info = []
-    for u in user_query:
-        user_info = UserAdminGetResponse(
-            id=u.id,
-            company_id=u.company_id,
-            department_id=u.department_id,
-            user_name=u.user_name,
-            name_kana=u.name_kana,
-            email=u.email,
-            storage=u.storage,
-            age=u.age,
-            sex=u.sex,
-            admin=u.admin
-        )
-        users_info.append(user_info)
+    result = (db.query(User.id,
+                       User.company_id,
+                       Company.company_name,
+                       User.department_id,
+                       Department.department_name,
+                       User.user_name,
+                       User.name_kana,
+                       User.email,
+                       User.storage,
+                       User.age,
+                       User.sex,
+                       User.permission,
+                       User.admin,
+                       )
+        .select_from(User)
+        .outerjoin(Company,
+                   User.company_id == Company.id
+                  )
+        .outerjoin(Department,
+                   User.department_id == Department.id
+                  )
+        .filter(User.delete_flg == "false")
+        .order_by(User.company_id)
+        .all()
+    )
 
-    return users_info
+    if not result:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return result
 
 # ユーザー情報更新機能
 @router.put("/update_user", response_model=UserUpdateResponse, status_code=status.HTTP_200_OK)
@@ -229,6 +232,8 @@ async def update_user(db: DbDependency, user: UserDependency, user_update: UserU
     user_query.user_name = user_update.user_name
     user_query.name_kana = user_update.name_kana
     user_query.email = user_update.email
+    user_query.age = user_update.age
+    user_query.sex = user_update.sex
     # user_query.icon = user_update.icon
     user_query.update_at = datetime.now()
 
@@ -240,6 +245,8 @@ async def update_user(db: DbDependency, user: UserDependency, user_update: UserU
         user_name=user_query.user_name,
         name_kana=user_query.name_kana,
         email=user_query.email,
+        age=user_query.age,
+        sex=user_query.sex,
         # icon=user_query.icon
     )
 
@@ -247,13 +254,13 @@ async def update_user(db: DbDependency, user: UserDependency, user_update: UserU
 
 # ユーザー情報更新機能(Admin権限)
 @router.put("/update_user_admin", status_code=status.HTTP_200_OK)
-async def update_user_admin(db: DbDependency, user: UserDependency, user_update: UserAdminUpdate, user_id: int):
+async def update_user_admin(db: DbDependency, user: UserDependency, user_update: UserAdminUpdate):
     if not user.admin:
         raise HTTPException(status_code=403, detail="No authority")
 
     user_query = db.query(User)\
         .filter(
-            User.id == user_id,
+            User.id == user.user_id,
             User.delete_flg == "false"
             )\
         .first()

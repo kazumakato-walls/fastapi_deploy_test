@@ -1,12 +1,12 @@
-from calendar import c
 from datetime import date
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field
 
-class ItemStatus(Enum):
+class ItemStatus(str, Enum):
     man = "男"
     woman = "女"
+    other = "その他"
 
 class UserSignup(BaseModel):
     personal_id: str = Field(min_length=6, examples=["test1234"])
@@ -55,7 +55,6 @@ class UserAdminGetResponse(BaseModel):
     user_name: str = Field(min_length=2, examples=["Walls太郎"])
     name_kana: Optional[str] = Field(min_length=2, examples=["うぉーるずたろう"])
     email: Optional[str] = Field(min_length=8, examples=["test@walls-inc.com"])
-    storage: int = Field(gt=0, examples=[1])
     age: Optional[date] = Field(examples=['1999-01-01'])
     sex: Optional[ItemStatus] = Field(None, examples=[ItemStatus.man])
     admin: bool = Field()
@@ -70,12 +69,16 @@ class UserUpdateResponse(BaseModel):
     user_name: str = Field(min_length=2, examples=["Walls太郎"])
     name_kana: Optional[str] = Field(min_length=2, examples=["うぉーるずたろう"])
     email: Optional[str] = Field(min_length=8, examples=["test@walls-inc.com"])
+    age: Optional[date] = Field(examples=['1999-01-01'])
+    sex: Optional[ItemStatus] = Field(None, examples=[ItemStatus.man])
 
 class UserUpdate(BaseModel):
     department_id: int = Field(gt=0, examples=[1])
     user_name: str = Field(min_length=2, examples=["Walls太郎"])
     name_kana: Optional[str] = Field(min_length=2, examples=["うぉーるずたろう"])
     email: Optional[str] = Field(min_length=8, examples=["test@walls-inc.com"])
+    age: Optional[date] = Field(examples=['1999-01-01'])
+    sex: Optional[ItemStatus] = Field(None, examples=[ItemStatus.man])
     # icon: str = Field(min_length=2, examples=["アイコン"])
 
 class UserPasswordUpdate(BaseModel):
